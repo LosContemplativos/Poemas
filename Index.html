@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuaderno de Poemas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:wght@300;400&family=IBM+Plex+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--s1:#111;--s2:#191919;--s3:#222;--b1:#2a2a2a;--b2:#3c3c3c;--b3:#555;--t1:#efefef;--t2:#999;--t3:#555;--t4:#333;--wh:#fff;--r:6px}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-weight:300;overflow:hidden}
+.app{display:grid;grid-template-columns:310px 1fr;grid-template-rows:58px 1fr;height:100vh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--b1);background:var(--s1)}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;letter-spacing:.04em;color:var(--wh)}
+.logo em{font-style:italic;font-size:13px;color:var(--t3);margin-left:12px;font-family:'IBM Plex Sans',sans-serif;font-weight:200;letter-spacing:.1em}
+.btn-new{background:var(--wh);color:#000;border:none;padding:7px 18px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:opacity .2s}
+.btn-new:hover{opacity:.8}
+.sidebar{border-right:1px solid var(--b1);background:var(--s1);display:flex;flex-direction:column;overflow:hidden}
+.search-wrap{padding:13px 15px;border-bottom:1px solid var(--b1)}
+.search-wrap input{width:100%;background:var(--s2);border:1px solid var(--b1);color:var(--t1);padding:8px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:300;border-radius:var(--r);outline:none;transition:border-color .2s}
+.search-wrap input::placeholder{color:var(--t4)}
+.search-wrap input:focus{border-color:var(--b3)}
+.filters{padding:8px 13px;border-bottom:1px solid var(--b1);display:flex;gap:5px;flex-wrap:wrap;min-height:34px;align-items:center}
+.chip{background:0;border:1px solid var(--b1);color:var(--t3);padding:3px 9px;font-family:'IBM Plex Sans',sans-serif;font-size:9px;letter-spacing:.1em;border-radius:20px;cursor:pointer;text-transform:uppercase;transition:all .15s}
+.chip:hover,.chip.on{border-color:var(--b3);color:var(--t1)}
+.chip.on{background:var(--s3)}
+.pcount{padding:7px 15px;font-size:9px;color:var(--t4);letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid var(--b1)}
+.plist{overflow-y:auto;flex:1}
+.plist::-webkit-scrollbar{width:3px}
+.plist::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.pitem{padding:12px 15px;cursor:pointer;border-left:3px solid transparent;transition:all .14s;border-bottom:1px solid rgba(42,42,42,.6)}
+.pitem:hover{background:var(--s2);border-left-color:var(--b3)}
+.pitem.on{background:var(--s2);border-left-color:var(--wh)}
+.ptitle{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:var(--t1);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem.on .ptitle{color:var(--wh)}
+.pmeta{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:10px;border:1px solid var(--b2);color:var(--t3)}
+.tag.pri{border-color:var(--b3);color:var(--t2)}
+.empty-sb{padding:36px 18px;text-align:center;color:var(--t4);font-family:'Playfair Display',serif;font-style:italic;font-size:14px;line-height:1.9}
+.main{overflow-y:auto;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:3px}
+.main::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.no-sel{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t4)}
+.no-sel .glyph{font-family:'Playfair Display',serif;font-style:italic;font-size:70px;color:var(--b2)}
+.no-sel p{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--t4)}
+.detail{padding:44px 54px;flex:1}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;padding-bottom:22px;border-bottom:1px solid var(--b1)}
+.dtitle{font-family:'Playfair Display',serif;font-size:38px;font-weight:400;line-height:1.1;color:var(--wh)}
+.dbtns{display:flex;gap:7px;flex-shrink:0;margin-left:18px;margin-top:4px}
+.dbtn{background:0;border:1px solid var(--b2);color:var(--t3);padding:6px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:all .16s}
+.dbtn:hover{border-color:var(--b3);color:var(--t1)}
+.dbtn.copy:hover{border-color:var(--wh);color:var(--wh)}
+.dbody{display:grid;grid-template-columns:1fr 330px;gap:48px}
+.poem-col h3,.info-col h3{font-family:'IBM Plex Sans',sans-serif;font-size:9px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);margin-bottom:14px}
+.poem-text{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:300;line-height:2.1;color:var(--t1);white-space:pre-wrap}
+.info-col{display:flex;flex-direction:column;gap:14px}
+.iblock{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:15px 17px}
+.iblock h4{font-size:9px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:8px}
+.iblock .val{font-size:13px;color:var(--t2);line-height:1.65;font-weight:300}
+.ibadges{display:flex;flex-wrap:wrap;gap:6px}
+.ibadge{font-size:11px;padding:4px 11px;border-radius:var(--r);border:1px solid var(--b2);color:var(--t2)}
+.estr-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.estr-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2)}
+.etag{font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:3px;min-width:54px;text-align:center;border:1px solid var(--b2);color:var(--t3)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:10px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:32px 36px}
+.modal::-webkit-scrollbar{width:3px}
+.modal::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.modal h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:var(--wh);margin-bottom:26px}
+.frow{margin-bottom:18px}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px}
+.frow label,.frow2 label{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;font-weight:400}
+.frow input,.frow textarea,.frow select,.frow2 input,.frow2 select{width:100%;background:var(--s2);border:1px solid var(--b1);color:var(--t1);padding:9px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:300;border-radius:var(--r);outline:none;transition:border-color .2s}
+.frow input:focus,.frow textarea:focus,.frow select:focus,.frow2 input:focus,.frow2 select:focus{border-color:var(--b3)}
+.frow textarea{min-height:145px;resize:vertical;line-height:1.8;font-family:'IBM Plex Mono',monospace;font-size:13px}
+.frow select option,.frow2 select option{background:var(--s2)}
+.fhint{font-size:10px;color:var(--t4);margin-top:5px;line-height:1.5}
+.estr-ed{display:flex;flex-direction:column;gap:7px}
+.estr-row{display:grid;grid-template-columns:108px 1fr 30px;gap:7px;align-items:center}
+.estr-row select,.estr-row input{background:var(--s2);border:1px solid var(--b1);color:var(--t1);padding:7px 10px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;border-radius:var(--r);outline:none;width:100%}
+.btn-rm{background:0;border:1px solid var(--b1);color:var(--t4);width:30px;height:32px;cursor:pointer;border-radius:var(--r);font-size:15px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.btn-rm:hover{border-color:var(--b3);color:var(--t2)}
+.btn-addrow{background:0;border:1px dashed var(--b1);color:var(--t4);padding:7px;font-family:'IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:all .15s;margin-top:3px;width:100%}
+.btn-addrow:hover{border-color:var(--b3);color:var(--t2)}
+.mactions{display:flex;justify-content:flex-end;gap:9px;margin-top:26px;border-top:1px solid var(--b1);padding-top:20px}
+.btn-cancel{background:0;border:1px solid var(--b1);color:var(--t3);padding:9px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:all .16s}
+.btn-cancel:hover{border-color:var(--b3);color:var(--t1)}
+.btn-save{background:var(--wh);color:#000;border:none;padding:9px 24px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:opacity .2s}
+.btn-save:hover{opacity:.82}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--s2);border:1px solid var(--b2);color:var(--t1);padding:10px 16px;border-radius:var(--r);font-size:12px;z-index:200;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">Cuaderno de Poemas <em>para canciones</em></div>
+    <button class="btn-new" onclick="openModal()">+ Nuevo poema</button>
+  </div>
+  <div class="sidebar">
+    <div class="search-wrap"><input type="text" id="sInput" placeholder="Buscar..." oninput="renderList()"></div>
+    <div class="filters" id="filtersBar"></div>
+    <div class="pcount" id="pcount"></div>
+    <div class="plist" id="plist"></div>
+  </div>
+  <div class="main" id="main">
+    <div class="no-sel"><div class="glyph">✦</div><p>Selecciona un poema</p></div>
+  </div>
+</div>
+<div class="overlay" id="overlay" onclick="handleOv(event)">
+  <div class="modal">
+    <h2 id="mTitle">Nuevo Poema</h2>
+    <input type="hidden" id="eId">
+    <div class="frow"><label>Título</label><input type="text" id="fTitle" placeholder="Título del poema..."></div>
+    <div class="frow"><label>Letra</label><textarea id="fText" placeholder="Pega o escribe el poema aquí..."></textarea></div>
+    <div class="frow2">
+      <div><label>Mood</label>
+        <select id="fMood"><option value="">— Sin definir —</option><option>Melancólico</option><option>Romántico</option><option>Nostálgico</option><option>Contemplativo</option><option>Existencial</option><option>Irónico</option><option>Oscuro / Místico</option><option>Rabia / Protesta</option><option>Sarcástico</option><option>Sensual / Provocador</option><option>Épico</option><option>Filosófico</option><option>Intimista</option></select>
+      </div>
+      <div><label>Género</label>
+        <select id="fGenre"><option value="">— Sin definir —</option><option>Post-punk</option><option>Punk</option><option>Rock</option><option>Heavy / Doom</option><option>Hardcore</option><option>Indie rock</option><option>Shoegaze</option></select>
+      </div>
+    </div>
+    <div class="frow2">
+      <div><label>Tempo</label>
+        <select id="fTempo"><option value="">— Sin definir —</option><option>Muy lento</option><option>Lento</option><option>Moderado</option><option>Moderado-rápido</option><option>Rápido</option></select>
+      </div>
+      <div><label>Tonalidad</label>
+        <select id="fKey"><option value="">— Sin definir —</option><option>Menor</option><option>Menor modal</option><option>Mayor</option><option>Menor con variaciones</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <label>Estructura</label>
+      <div class="estr-ed" id="estrEd"></div>
+      <button class="btn-addrow" onclick="addRow()">+ Agregar sección</button>
+    </div>
+    <div class="frow"><label>Acentos y patrón silábico</label><textarea id="fAccents" style="min-height:80px" placeholder="Sílabas por verso, tipo de rima..."></textarea></div>
+    <div class="frow"><label>Referencia musical</label><input type="text" id="fRef" placeholder="Suena como..."></div>
+    <div class="frow"><label>Notas del autor</label><textarea id="fNotes" style="min-height:90px" placeholder="Contexto, emoción, intención..."></textarea></div>
+    <div class="frow"><label>Prioridad</label>
+      <select id="fPri"><option value="normal">Normal</option><option value="alta">Alta — convertir primero</option><option value="baja">Baja — para más adelante</option></select>
+    </div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="savePoem()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SEC=['Intro','Verso','Coro','Pre-coro','Puente','Remate','Outro','Interludio'];
+let eRows=[],poems=[],selId=null,fM='',fG='';
+
+const SEED=[
+{id:'p01',ca:1e12+1,title:'A mi ilusión',
+text:`Que es solo sombra\nembriago fantasmal,\nvicio emocional...\nPasada memoria.\n\nAlucinaciones furtivas,\nsenderos cómodos\nque a los hombres vuelve locos.\n\nA mi fantasía,\nque me pierde,\nvagando sola,\npor mi mente.\n\nA la alevosía\nde volver intranquila\nla serena corriente.`,
+mood:'Contemplativo',genre:'Post-punk',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Guitarra reverberada, ambiente neblinoso'},{t:'Verso',d:'Estrofas 1 y 2'},{t:'Verso',d:'Estrofas 3 y 4'},{t:'Outro',d:'Se desvanece lentamente'}],
+accents:'Versos cortos de 4–7 sílabas. Ritmo libre, sin rima fija. El acento cae de forma natural e irregular.',
+ref:'The Cure "A Forest" — atmósfera soñolienta y repetitiva',
+notes:'Poema sobre la ilusión como vicio, como alucinación que enloquece. Tono onírico y delirante. Guitarra muy reverberada, casi estática. Una melodía que suene a niebla.',
+priority:'normal'},
+
+{id:'p02',ca:1e12+2,title:'Al que escriba',
+text:`Del público depende todo,\nde si coméis caviar\no os bañáis en el lodo.\n\nY poco le tienta,\nal gentilhombre o dama,\nvuestras figuras rétoras\nsi somnífera es vuestra trama.\n\nSi no tiene chispa,\nni prendiéndolo a bala\n¿De que sirve el dinero\nque al gobierno reclamas?\n\nY os quejareis\no será vuestra vana gloria\nque sois "incomprendidos"\nen tu arte aburrido\nque ni a las musas importa.`,
+mood:'Sarcástico',genre:'Punk',tempo:'Moderado-rápido',key:'Menor',
+estructura:[{t:'Verso',d:'Estrofa 1'},{t:'Verso',d:'Estrofa 2'},{t:'Verso',d:'Estrofa 3'},{t:'Remate',d:'Estrofa final — con rabia'}],
+accents:'Versos de 6–9 sílabas. Rima irregular, tono burlón. El ritmo del habla manda sobre la métrica.',
+ref:'Dead Kennedys — actitud y sarcasmo directo',
+notes:'Crítica feroz al artista mediocre que culpa al público de su fracaso. Actitud punk pura. Voz al frente sin adornos. Riff simple y repetitivo que acompañe la ironía.',
+priority:'normal'},
+
+{id:'p03',ca:1e12+3,title:'Alegato a Ella',
+text:`Abogada Belinda, usted\nme hace perder el juicio.\nA todo lo ancho y a todo\nlo hondo, estoy en el fondo,\nenredado en tu hechizo.\n\nAbogada Belinda, ¿Dónde\nquedó la tutela que hice\npor tus ojos de estrella y tu falda,\nque tanto me faltan?\n\nCon cuatro palabras\nes que ganas un caso.\n¿Cuántas tendré que\ndecir para que me hagas caso?\n\n¿No es acaso ilegal\nla pena de muerte?\n¿Por qué me condenas\na no volver a verte?\n\nAbogada Belinda, crimen culposo,\nestos alevosos versos\nestando usted perdida\nen los brazos de otro afecto.\n\nMas en mi defensa,\nme defiende el arte,\ncomo droga dura,\ncomo sueño aparte.\n\nDe que en la amargura,\nde que en el desastre\ntu figura en texto\nes lo que perdura,\nsin ningún desgaste.\n\nY diré que eres musa\no tal vez cruel excusa,\nsiendo lirica reclusa\nde los versos de mi arte.\n\nO puedo ser honesto\ny perder el juicio,\nconfesando que te quiero:\nSiendo un subrepticio,\nsiendo un desatino,\nun advenedizo\nun desesperado.\n\nY que mil y un paraísos\nhechos de verso y tinta\nson los que he dispuesto\npara tu deleite...\no para tu conquista.\n\nsiendo un desagrado,`,
+mood:'Romántico',genre:'Post-punk',tempo:'Moderado',key:'Menor con variaciones',
+estructura:[{t:'Intro',d:'Riff principal'},{t:'Verso',d:'Estrofas 1–2 (presentación)'},{t:'Coro',d:'"Abogada Belinda, crimen culposo..."'},{t:'Verso',d:'El arte como defensa'},{t:'Coro',d:'Repetición'},{t:'Puente',d:'"O puedo ser honesto..."'},{t:'Outro',d:'Confiesa todo — climax vocal'}],
+accents:'Versos de 7–10 sílabas. Rima asonante irregular. La anáfora "Abogada Belinda" es el gancho natural del coro.',
+ref:'The Smiths / Morrissey — declaración de amor elocuente y ligeramente autocompasiva',
+notes:'Declaración de amor con metáforas del derecho. Largo y épico, podría ser una canción de 5–6 minutos. El tono va de la ironía al despecho genuino al final. Uno de los más trabajados.',
+priority:'alta'},
+
+{id:'p04',ca:1e12+4,title:'Canción con voz de mujer',
+text:`Ya estoy harta de\nque me veas como objeto\nde tus rimas, de tus versos\nde alguno de tus sonetos.\n\nNo soy tuya,\nno todavía...\ny mi sediciosa alcoba\ndesea traicionar la pluma\ncon la que me declamas\ndivina.\n\nNo soy de nácar,\nni tampoco de espuma.\nPero usted es un hombre\ny yo una dama,\nque se halla enamorada,\n¿Por que te me esfumas,\nen las madrugadas?\n\nQuiero ahorcarte\nentre mis rizos,\ndeja de enviarme escritos\nbúscame en el lado desierto\ny suelta de tu mano la pluma\ny ven toca todo mi cuerpo.\n\nEstoy harta de posar\npara que me retrates\nentre tus versos\ncomo un ser perfecto.\ndéjame mostrarte, desnuda,\ntodos mis defectos.\n\n¡Domíname un poco!\ntu castidad es la de un loco\ny que sepas lo he practicado\nlo bien que suena tu nombre\nentre mis suspiros agitados.\n\nSeré como Eva:\nProhibidos del paraíso\nmas nunca cohibidos\ndel placer del delito.`,
+mood:'Sensual / Provocador',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Estrofa 1 — reclamo inicial'},{t:'Coro',d:'"No soy tuya, no todavía..."'},{t:'Verso',d:'El cuerpo y la madrugada'},{t:'Coro',d:'Repetición con más intensidad'},{t:'Puente',d:'"¡Domíname un poco!" — climax'},{t:'Outro',d:'Eva y el paraíso'}],
+accents:'Ritmo conversacional. Versos irregulares de 6–10 sílabas. El énfasis viene de la voz, no de la métrica.',
+ref:'PJ Harvey "Rid of Me" — voz femenina con autoridad y tensión física',
+notes:'Necesita voz femenina o un hombre que suene vulnerable. La guitarra tiene que sonar con actitud — sucia pero controlada. Es la respuesta al poeta que escribe sobre mujeres sin tocarlas.',
+priority:'normal'},
+
+{id:'p05',ca:1e12+5,title:'Canción de Salsa',
+text:`Solo te amo cuando no te tengo,\ne imagino tu pelo, como hojas del bosque,\ndonde busco furtivo, tu sensual recuerdo.\n\nSolo te amo cuando no te tengo,\ny tus leves curvas son en mi mapa,\nla ruta a seguir hacia tu cama/alma,\ndesde la sierra de los cobardes\nhasta el mar de tu cuerpo.\n\nSolo te amo cuando no te tengo\ny de mi las nubes han aprendido\ndel llorar por alguien\nsin importar el tiempo.\n\nCuando no te tengo solo amo,\nEl desaforado destino,\nel cual estoico he aceptado;\n¡El no estar contigo!\n\nY simplemente he entendido\no tergiversado hasta volverlo rima\n--Que aunque filosa es menos lesiva--\n¡Que te amo y que no te tengo!`,
+mood:'Melancólico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Coro',d:'"Solo te amo cuando no te tengo" — arranque directo'},{t:'Verso',d:'Imagen del mapa y el cuerpo'},{t:'Coro',d:'Repetición'},{t:'Puente',d:'"Cuando no te tengo solo amo..."'},{t:'Coro',d:'Cierre con variación final'}],
+accents:'"Solo te amo cuando no te tengo" — 11 sílabas con acento en te/amo/no/ten-go. Perfecto como gancho repetitivo.',
+ref:'The National "Bloodbuzz Ohio" — melancolía repetitiva que hipnotiza',
+notes:'El título es ironía total, nada que ver con salsa. Tiene estribillo natural y poderoso. El riff debe ser obsesivo, como quien no puede dejar de pensar en alguien. De las más fáciles de musicalizar.',
+priority:'alta'},
+
+{id:'p06',ca:1e12+6,title:'Carta a Belinda',
+text:`Se fue, (te fuiste)\nComo se marchan los astros\nen las noches más bellas.\nInundada en llamas\nalejándose sin cautelas.\n\nEnciendo libertad en las llamas igníferas,\nque al carbón entre mudos espasmos esclaviza.\n\nMiro arriba,\nun techo aburrido\ncubriendo el vasto universo.\nMientras en estas páginas\ny en estas cuatro paredes\nescribo mi cosmos completo.\n\nMalditas las cosas que\nno están bajo mi control.\nDerrumban a pedazos\nmis mayores ilusiones.\n\nMalditas mis ilusiones que\nse derrumban por cosas\nque no están\nen mi reino\nde lo propio y,\nlo infundado,\nde lo santo y,\nlo profano.\n\nPero el amor\nque solo es de dos\nesta y la vez no\nen el dominio de lo propio.\n\nEs como la antorcha.\nHace poco la entendí.\n\nSi la tocas te hierve el papel,\nque tenemos por piel,\ny se calcina desaforado,\nel corazón desafortunado.\n\nSi del mango la agarras\ncon caricia y dulce arrebato\nte guía hasta en los senderos\nen el valle de las sombras.\n\n¡Pero yo quiero estar perdido!\ntener espejismos en los bosques\nde tu mirada y la mía.\nY encandilarme con el azul de sus ojos\n(Ya no recuerdo si eran de ese color)\n\nBusco entonces reemplazarte.\nRemedio de los amantes muertos,\no de los museos sangrantes.\nCon la misma hoja quirúrgica,\nque, en la madrugada, el robo\ndel siglo realizaste,\nrasgando la tela,\nseparando el mosaico.\n\nPero yo no soy el mismo.\nDesde que te vi.\nY no hay igual a ti.\nQue ya me viste a mí.\n\nUna sola obra guarda con recelo,\ny expone orgulloso.\nEl museo que antes en tu mente acometí\nY ahora piensa si cambiarte a ti\nO cambiarse a sí\nPues grises son los museos normales\nAhora imagina uno sin pinturas\ndonde van coaccionados los escolares.\n\nSe donde estas.\nSe donde estoy.\nPero no donde estamos,\ny te ubico en el mapa.\n\nMedellín,\ncon morrión en la frente\nme creo conquistador español\ndesentierro de Macondo un galeón\ny preparó la más desaforada expedición.\nComo hacia la fuente del Nilo\nbusco el hálito vital de tu corazón.\n\nHe subido al techo.\nNo hay estrellas, deseos\no ilusiones.\nNo hay visiones ni adivinos.\nNo hay placeres.\nNo hay amores.\nY viendo mi insignificancia,\nante el universo eterno y delirante,\nse acrecienta mi voluntad\nde a lo imposible dedicarme.\n\nY como el que cavó el canal,\nde Panamá.\nAbrir trochas entre los océanos y,\ncanales entre los matorrales y,\nabrir la puerta de tu alcoba\nen la madrugada,\ny en la mañana,\na la garantía del colchón reclamarle.\n\nHan ardido tus cartas bajo el castaño,\n(en realidad todo de lo que de ti escribí)\ny aun con mi duda\nY la certeza del viento\nNo se ha salvado ninguna,\nde aquel miramiento.\n\nNo eran azules tus ojos,\nni tampoco rojizos como,\nla candela que observaba\nrecordando la zozobra\nde cómo la memoria nos engaña.\n\nVi tu iris desprovisto de cielo despejado.\nEn una foto, entre un fondo blanco\ncubierto por tu pelo negro.\n\nDesvariaba en un verde apagado,\ntus lindos ojos.\nDe campos donde aún quiero\ncontigo transitar entre las gotas\ny ese olor tan bello\nde la lluvia.\n\nPero ahora estás muerta,\ny yo sin tumba,\na donde visitar.\n\nY sueño contigo,\nApareces como foránea\nEn medio de tormentas,\nSituaciones extrañas,\ny desconocidas,\nde ilusiones oníricas.\n\nEstás muerta.\nO algo incluso peor,\nestudiando abogacía.`,
+mood:'Melancólico',genre:'Post-punk',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Guitarra sola — largo'},{t:'Verso',d:'La partida y las llamas'},{t:'Verso',d:'"Malditas las cosas..." — sube intensidad'},{t:'Puente',d:'La antorcha — reflexión central'},{t:'Verso',d:'El museo / Medellín / conquista'},{t:'Climax',d:'"He subido al techo..." — máxima intensidad'},{t:'Outro',d:'"Estás muerta. O algo peor..." — caída súbita'}],
+accents:'El más largo y complejo. Versos cortos fragmentados. Ritmo de monólogo interno, no métrico. La música debe respirar con el texto.',
+ref:'Nick Cave & The Bad Seeds "The Ship Song" — épica íntima y cinematográfica',
+notes:'Su poema más ambicioso. Una carta de amor/duelo que recorre Macondo, museos, techos y ojos verdes. Podría ser una canción de 7–8 minutos con varias partes. El remate final ("estudiando abogacía") es humor negro demoledor.',
+priority:'alta'},
+
+{id:'p07',ca:1e12+7,title:'De tu lejano Iris',
+text:`De tu lejano iris,\nla galaxia arrebata\nestrellas infinitas\nde tu mirada que mata\n\nDe tu dentadura\ndestilan las nubes,\nsu nívea hermosura\n\nDe tu trato franco,\naprenden los santos.\n\nMorire un día\ny en nuevos idiomas\ndesconocidas gentes\nveran en mis versos\nuna desconocida amada\ny aun muerta\ncon la constancia del sol\nserás recordada.`,
+mood:'Romántico',genre:'Shoegaze',tempo:'Lento',key:'Menor',
+estructura:[{t:'Verso',d:'Tres imágenes — iris, dientes, trato'},{t:'Puente',d:'La promesa de ser recordada'},{t:'Outro',d:'Se desvanece en reverb'}],
+accents:'Versos de 5–8 sílabas. Rima asonante suave (arrebata/mata). Ritmo sereno y constante.',
+ref:'Interpol "Obstacle 1" — intensidad contenida bajo superficie tranquila',
+notes:'El más lírico y breve. Una joya pequeña. Ideal para guitarra limpia con mucho reverb. Nota: el autor menciona que existe una versión mejor escrita en algún lado.',
+priority:'normal'},
+
+{id:'p08',ca:1e12+8,title:'El cumpleañero frente al pelotón de fusilamiento',
+text:`De momento el único fuego es de las velas,\nque a sus ojos revelan como acuarelas,\npintadas con absorta tristeza, inulta solemnidad.\n\nNublan su vista coágulos llorosos,\nazul sangre de provisional catarata,\nnatural lubricante de banales tragedias,\ncomo las guerras perdidas por tiranos odiosos.\n\nEs su ropa un lienzo, uniforme barroco,\nun poco mas colorido que el de los otros armados locos;\nmedallas, como maraña, el pecho le cubren.\n\nEs un fresco de seco realismo:\nlluvia, sudor, barro...\nque derrama por los costados\n(todo le da lo mismo)\n\nEs su rostro un drama\nde esos que las llamas trasnochan\nhasta la madrugada.\n\nGélidas las caras\nque le celebran\na su vida un año\ncon sus voces de huraños.\n\nCon subrepticia calma\ncantan los números en\nlos que su cuerpo,\nha portado su alma.\n\nApuntan armas,\nameanzantes puntas afiladas.\n\nDe torta le han dado\nuna ración de balas\nen parsimonia fusilada.\n\nNo quedó nada,\nla guerra huyó acobardada.`,
+mood:'Oscuro / Místico',genre:'Heavy / Doom',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Pesado y lento — imagen de las velas'},{t:'Verso',d:'El uniforme y el realismo barroco'},{t:'Verso',d:'El rostro, los celebrantes fríos'},{t:'Climax',d:'"Apuntan armas..." — pico de tensión'},{t:'Remate',d:'"No quedó nada" — caída súbita'}],
+accents:'Versos largos de 10–14 sílabas. Lenguaje barroco y pesado. El ritmo es ceremonial, como un desfile fúnebre.',
+ref:'Bauhaus meets Tom Waits — teatralidad oscura y surrealista',
+notes:'Un cumpleaños militar donde las velas son rifles. Cinematográfico y oscuro. La música debe sonar como un funeral con banda de guerra. Una de las imágenes más potentes del cuaderno.',
+priority:'normal'},
+
+{id:'p09',ca:1e12+9,title:'Exilio Australiano',
+text:`Yo soy del exilio,\ny sus cuentos de idilio.\nMi hogar es mi cuerpo,\nY mi patria es mi alma.\n\nNula es mi calma\nanclado a una tierra\nque ha estado por eras\ny estará mucho después\nque quienes me recuerden\nsus huesos al tiempo cedan.\n¿Qué me pertenece de ella\nmas que la marca de mi suela?\n\nY no me consuela\nrutina ordinaria\nsuperfluas cosas.\nsino minimalista carga\nen las fuerzas de mi alma:\nMi honra y mi sombra.`,
+mood:'Existencial',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Coro',d:'"Yo soy del exilio..." — estribillo de apertura'},{t:'Verso',d:'La tierra que no le pertenece'},{t:'Coro',d:'Repetición'},{t:'Outro',d:'"Mi honra y mi sombra"'}],
+accents:'Tiene estructura de canción natural. "Yo soy del exilio / y sus cuentos de idilio / Mi hogar es mi cuerpo / Y mi patria es mi alma" — cuarteto de 6–8 sílabas perfecto.',
+ref:'Joy Division "Atmosphere" — soledad existencial y ritmo hipnótico',
+notes:'El poema YA tiene estructura de canción con el estribillo repetido. Es de los más fáciles de musicalizar. Habla de no pertenecer a ningún lugar. Muy buena base para post-punk atmosférico.',
+priority:'alta'},
+
+{id:'p10',ca:1e12+10,title:'Exorcismo',
+text:`Después de tres padrenuestros proclamar,\ncon respeto inverencial e ignorante valentía:\n\nNosotros, hombres mundanos\ntemerosos solo de Dios y la muerte\nSi estáis aquí:\nconcédeme el lujo de verte.\n\nMaldice o bendice mi vista\ncon tu sutil presencia:\nUn viento, una luz\ndéjame escuchar tu voz\nsin usar los oídos.\n\nSi la dimensión que habitáis\nes de dolor inconmensurable\n\nSi teméis como os temo\n\nSi eres impermanente aun\ndespués de la misma muerte.\n\nEntonces no somos tan diferentes.`,
+mood:'Oscuro / Místico',genre:'Heavy / Doom',tempo:'Muy lento',key:'Menor modal',
+estructura:[{t:'Intro',d:'Una sola nota sostenida en guitarra'},{t:'Verso',d:'El ritual — los tres padrenuestros'},{t:'Verso',d:'Preguntas al espíritu — los "Si..."'},{t:'Remate',d:'"Entonces no somos tan diferentes" — silencio final'}],
+accents:'Ritmo ceremonial. Los "Si..." crean una anáfora que puede usarse como estructura musical de crescendo.',
+ref:'Tool "Pushit" meets The Sisters of Mercy — ritual y oscuridad sagrada',
+notes:'Tono de ceremonia espiritual. Una sola nota de bajo o guitarra sostenida puede ser toda la base. La voz lo es todo. El remate es filosófico y demoledor: el vivo y el muerto son lo mismo.',
+priority:'normal'},
+
+{id:'p11',ca:1e12+11,title:'Guerra',
+text:`Por ahí va el coronel\ncon treinta y dos\nguerras perdidas,\nbajo el anden\nque sus pies caminan.\n\nOrfebre del verso,\nde letras de oro\ny peces de rima.\nSe retira silente\nde sus batallas,\nante gesto de dama\no femenina mirada.\nQue no domina.`,
+mood:'Irónico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Imagen del coronel caminando'},{t:'Verso',d:'El orfebre y su derrota ante la mujer'}],
+accents:'Muy breve. Versos de 4–8 sílabas. Rima asonante suave.',
+ref:'Leonard Cohen adaptado al post-punk — retrato literario con humor seco',
+notes:'Autorretrato irónico. El coronel de las guerras de amor perdidas es el propio poeta. Muy breve — puede ser interludio instrumental con voz mínima, o expandirse como puente de otra canción.',
+priority:'baja'},
+
+{id:'p12',ca:1e12+12,title:'Hay un tirano',
+text:`Hay un tirano, espantado.\nQue en su sueño es espartano\nque ni merecerá ser fusilado.\nPues, acobardado, escapará\na algún país del imperialismo malvado.\n\nHay un tirano, ensangrentado,\ncon la tinta de una mosca:\nlo unico que puede matar el singao.\n\nHay un tirano\ntan "aterrador" como aterrorizado\nde que por machetas\nvague su cabeza\npor la Habana Vieja.\n\nHay un tirano\nque tirandonos al destierro\n--de la otra costa o de carcel angosta--\ncree salvar su pescuezo\nel tiempo que le sobra\n\nY escondida,\nresisten,\nluchan`,
+mood:'Rabia / Protesta',genre:'Hardcore',tempo:'Rápido',key:'Menor',
+estructura:[{t:'Verso',d:'"Hay un tirano, espantado..."'},{t:'Verso',d:'"Hay un tirano, ensangrentado..."'},{t:'Verso',d:'"Hay un tirano, aterrorizado..."'},{t:'Verso',d:'"Hay un tirano que nos destierra..."'},{t:'Remate',d:'"Y escondida, resisten, luchan" — sotto voce'}],
+accents:'La anáfora "Hay un tirano" es el riff vocal. Se repite como martillo. El final baja de golpe.',
+ref:'Rage Against The Machine meets Dead Kennedys — rabia política sin disculpas',
+notes:'La anáfora "Hay un tirano" es perfecta para un riff que se repite con cada estrofa. El final inesperadamente quieto ("resisten, luchan") es el golpe más fuerte.',
+priority:'normal'},
+
+{id:'p13',ca:1e12+13,title:'Imitando a Buesa de cabeza',
+text:`Si por este mundo voy derecho y obtuso\n¿Como me enredare entre tus castaños rizos?\no en la falda mas linda que el mundo puso.\n¿Como embriargarme en tu hondo hechizo?\n\n¿Como sin hablarte puedo decirte\n--Solo mirandote, saborear--\nlo dulce de mis palabras\ny lo sensual de mi pensar?\n\n¿Podré ser un panoptico\ny fascinarme sin ser visto\nde tu moda vanguardista\ncomo el mas vil totalitarista?\ny antojarme de ti un poco ¡Mas!\nsolo un poco mas.\nHasta que me pierda en tu vista.`,
+mood:'Romántico',genre:'Indie rock',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Primera pregunta — los rizos'},{t:'Verso',d:'Segunda — mirar sin hablar'},{t:'Puente',d:'El panóptico — sube intensidad'},{t:'Outro',d:'"Solo un poco más..."'}],
+accents:'Cuartetos de ~9–10 sílabas. Rima ABAB en la primera estrofa. Preguntas retóricas como estructura.',
+ref:'The Smiths "There Is A Light That Never Goes Out" — enamoramiento observador e irónico',
+notes:'Tono de enamoramiento voyeur, algo juguetón. El "panóptico" es un guiño intelectual que funciona. Más liviano que otros — podría ser la canción más accesible del repertorio.',
+priority:'normal'},
+
+{id:'p14',ca:1e12+14,title:'Imitando a Buesa',
+text:`Dice y mienten, que es usted un "tesoro"\nsin oro ni perlas, robado por el moro\ndigo yo sin decoro.\n\nVestida de seda con pétalos de rosa,\npodrás ser la mas bella, pero nunca una esposa.\n¿Para que esposarte con áureo anillo?\nSi es obvio tu destino,\nde la seriedad del amor,\ntu estas en destierro.\n\nLlamadme histérico, llamadme poco hombre\npero para tu mal, la verdad nunca se esconde.\nPermíteme ser sincero, en estos funestos versos\nSi tu nombre no menciono, es por el respeto,\nque se le tiene a los padres, de los hijos muertos.\n\nY ora en mar, ora en tierra\nsigues teniendo la misma esencia\nla de una cualquiera, la de una ninguna\nque en la arena quedo su presencia/decencia\ny quien en una alcoba vendió su figura.`,
+mood:'Rabia / Protesta',genre:'Post-punk',tempo:'Moderado-rápido',key:'Menor',
+estructura:[{t:'Verso',d:'El "tesoro" falso'},{t:'Verso',d:'La seda y el destino'},{t:'Puente',d:'"Llamadme histérico..." — defensa de la verdad'},{t:'Remate',d:'"La de una cualquiera..." — golpe final'}],
+accents:'Versos de 10–12 sílabas. Rima consonante trabajada. El lenguaje es formal y el contenido brutal — esa tensión es la esencia.',
+ref:'The Clash meets Nick Cave — despecho con dicción poética',
+notes:'Despecho convertido en insulto elegante. La ironía de usar palabras cultas para decir algo tan crudo es la esencia del poema.',
+priority:'normal'},
+
+{id:'p15',ca:1e12+15,title:'Juego mi vida',
+text:`Juego mi vida,\nen casino o en el parque.\nLos blancos dados deciden mi suerte,\ny en el banco de madera espero mi muerte.\n\nJuego mi vida,\ny me compro una sotana\na Pascal pido consejo\ncon un parqués a Dios reto\nPa' que a mi alma dé el consuelo.\n\nJuego mi vida,\nen la guerra y la batalla.\n¡He ganado!\ny todos hemos perdido.\n\nJuego mi vida en la guerra\no la pierdo en la más aburrida paz.\n\nRelato mi vida queriendo ser mito\ny con alguna cara del héroe me proclamo.\nPor los siglos de los siglos alabado\nPor los milenios siguientes e inevitables,\nun pagano pasado.\n\nY a Greiff le robó unos versos,\n¿los adapto? o los destruyó,\nlos ahogó o ¿los auxilio?,\nDe su solitario exilio\nEn las islas de la historia,\nalejadas de cualquier galaxia.\n\nJuego mi vida.\nPierdo…\n¿Qué es volver a empezar?`,
+mood:'Existencial',genre:'Rock',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Coro',d:'"Juego mi vida" — arranque con el gancho'},{t:'Verso',d:'Pascal, los dados, Dios'},{t:'Coro',d:'Variación: guerra y paz'},{t:'Verso',d:'El mito, Greiff, el exilio'},{t:'Remate',d:'"Pierdo... ¿Qué es volver a empezar?"'}],
+accents:'La anáfora "Juego mi vida" es el estribillo natural. Versos de longitud variable. El ritmo oscila entre reflexivo y urgente.',
+ref:'Nick Cave "Jubilee Street" — épica existencial con crescendo inevitable',
+notes:'"Juego mi vida" es un estribillo poderoso. La referencia a Greiff (poeta colombiano) es un guiño local. Pregunta final devastadora. Una de las más épicas del cuaderno.',
+priority:'alta'},
+
+{id:'p16',ca:1e12+16,title:'La fuente de la felicidad',
+text:`La he buscado,\nla he tenido,\nla he apostado,\nla he perdido.\n\nLa he creído verla\naún a oscuras\nen los ojos azules\nde una mujer desnuda.\n\nO en el humo del puro\nque calma la ansiedad\ndel caribeño dictador,\nquien su pueblo ejecutara.\n\nFalaces son los diamantes,\ndel Congo o del hondo\npasillo\nde artificios laboratorios.\n\nCien expediciones de intrépitos,\nvuelven con maldiciones\ny dolores.\nAmarguras\nque perduran\nhasta su ultimo suspiro.\n\nDicen verla\nen las cavernas\ndonde anacoretas\ncallan al silencio\n\no en las aldeas\ndonde impertérritas\nmujeres arrean\nel creador instinto\nen forma de fluido\n\nObsesivos\nson los hombres\nde la ciencia\nsabios del átomo,\ncarentes de consciencia.\n\nSi el placer os conduce al dolor.\n¿No es solo otra\nmaldita ilusión?`,
+mood:'Filosófico',genre:'Post-punk',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Los cuatro versos cortos — contundente'},{t:'Verso',d:'La mujer, el dictador, los diamantes'},{t:'Verso',d:'Expediciones, cavernas, ciencia'},{t:'Remate',d:'"¿No es solo otra maldita ilusión?"'}],
+accents:'"La he buscado / la he tenido / la he apostado / la he perdido" — cuatro versos de 5 sílabas con ritmo de martillo. Perfecto para cuatro golpes de batería.',
+ref:'Nick Cave & The Bad Seeds "Higgs Boson Blues" — odisea filosófica pesada',
+notes:'Los cuatro versos iniciales son uno de los mejores arranques del cuaderno. Meditación sobre la felicidad como ilusión colectiva. El dictador caribeño, el Congo, los anacoretas — muy visual.',
+priority:'normal'},
+
+{id:'p17',ca:1e12+17,title:'La patria de las iguanas',
+text:`Arbustos movedizos,\ngallinas de cuatro patas,\nhormigas verdes\nque ignoras de la vista pasan.\n\n¡Por la tierra navegan\ncomo leve cadena\nentre trochas lóbregas\ncomo gran colmena!\n\nEl faraón reptiliano\nel mundo reptilíneo,\ncree tenerlo en su mano.\nIgual que el corso, el césar, el zar\no cuanto nombre muerto digo al azar.\n\nY la iguana princesa\nentre hojas de palma espesa\nreposa rebosante de nobleza\nrodeada de cien hormigas caballerescas.\n\nII\n\nLa iguanita esta triste`,
+mood:'Sarcástico',genre:'Punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'El mundo natural — iguanas y hormigas'},{t:'Verso',d:'El faraón reptiliano — metáfora del poder'},{t:'Verso',d:'La princesa iguana — nobleza absurda'},{t:'Outro',d:'"La iguanita está triste" — Parte II incompleta'}],
+accents:'Versos de 6–9 sílabas. Rima asonante. Ritmo juguetón que contrasta con la sátira política.',
+ref:'Manic Street Preachers meets The Clash — sátira política con energía punk',
+notes:'Metáfora política con iguanas como tiranos. Sarcástico e irreverente. NOTA: la Parte II está incompleta — queda pendiente terminarla.',
+priority:'baja'},
+
+{id:'p18',ca:1e12+18,title:'Las cosas que te hacen sonrojar',
+text:`Dime cuales son, tus sensuales fantasías\nque sin ser princesa disfrutas en veladas frías.\nDime cuales son, tus oscuros credos\ndime como es, el dios de tus deseos.\n\nLas cuchillas de tus dientes,\ncon malicia se deslizan\nformando una sonrisa.\n\n¿Cuál es el platillo de tu devoción?\n¿Qué es lo mas rico de mi sazón\nque en mi cama te hace extraviar la razón?\n\n¿Qué te vuelve roja rosa en mis jardines?\nQue hasta la pena te la desvistes\ny portan tus palmas, hebras lascivas\ndoradas con el brillo de tus salivas.\n\n¿Qué parte tu vergüenza\nen cómodas caricias?\n¿Qué quiebra el espejo\nque con tu pelo cubres\ntus dulces sandías?\n\n¿Cuáles son tus sueños\nfingiendo dormida\n"tu prístina inocencia"?\nO, ¿En qué posición\nquiere tu jaque mate?\nTu concupiscente corazón`,
+mood:'Sensual / Provocador',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Las fantasías — apertura directa'},{t:'Puente',d:'Las cuchillas de los dientes'},{t:'Coro',d:'Primera serie de preguntas retóricas'},{t:'Coro',d:'Segunda serie — más intenso'},{t:'Remate',d:'"Tu concupiscente corazón"'}],
+accents:'Versos de 9–12 sílabas. Rima asonante. Las preguntas retóricas pueden estructurar el estribillo naturalmente.',
+ref:'PJ Harvey "50ft Queenie" meets Nick Cave — erotismo directo con imagen poética',
+notes:'Erótico y muy directo. Las preguntas retóricas son el motor del poema y pueden estructurar el coro. El lenguaje oscila entre lo culto ("concupiscente") y lo visceral.',
+priority:'normal'},
+
+{id:'p19',ca:1e12+19,title:'Memento Mori',
+text:`Recuerda todos los días:\neres polvo...\npero no todavía.\n\nNo quedará sombra alguna\nde tus recuerdos,\nde penas y lamentos.\n\nLevántate, pues, muerto\nde la tumba que es tu cama\ny que el dorado del alba\nno te halle entre sábanas.`,
+mood:'Filosófico',genre:'Heavy / Doom',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Solo — una nota grave sostenida'},{t:'Verso',d:'"Eres polvo... pero no todavía"'},{t:'Verso',d:'Las sombras y los lamentos'},{t:'Remate',d:'"Levántate, pues, muerto" — orden final'}],
+accents:'Versos muy cortos de 3–7 sílabas. Contundentes como golpes. "Eres polvo... pero no todavía" es la frase más memorable.',
+ref:'Black Sabbath meets Joy Division — brevedad aplastante',
+notes:'Brevísimo pero uno de los más poderosos. "Eres polvo... pero no todavía" es una frase memorable y llena de tensión. Podría ser canción corta de 2 minutos, o arrancar un álbum completo.',
+priority:'normal'},
+
+{id:'p20',ca:1e12+20,title:'Mi América',
+text:`He plantado sobre el desierto\nsemillas de afectos inciertos,\nregadas con el rocío de tu cuerpo.\n\nHe arado sobre la mar\ncon la delicadeza de un fusil,\no como la caricia del viento\nque nuestro fuego logró apagar.\n\nY ahora que nuestro amor\nestá muerto.\nNo tengo tierra donde lamentar.\nSoy un náufrago del recuerdo.\n\nRevolucioné tu cuerpo,\ncambié las banderas rojas\nde tus pechos; retiré las tropas\ndel advenedizo dictador\nque tomó cautivo\ntu corazón furtivo.\n\n¡Me exilio de tu república!\nRecorriendo la frontera\nde tu pelo de canela,\no surcando los océanos\nde tus ojos acuarela.\n\nIndómita, belicosa,\ningobernable,\ncomo la América fue\npara el libertador delirante,\nresulta tu mirar, durante\nla guerra fría\nde nuestras miradas amantes.`,
+mood:'Épico',genre:'Rock',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Intro',d:'Riff potente — imagen del desierto'},{t:'Verso',d:'Las semillas, el mar, el amor muerto'},{t:'Verso',d:'La revolución del cuerpo'},{t:'Coro',d:'"¡Me exilio de tu república!" — grito central'},{t:'Outro',d:'"Indómita, belicosa, ingobernable..."'}],
+accents:'Versos de 8–11 sílabas. Ritmo expansivo, como un discurso político. El coro "¡Me exilio de tu república!" es un grito natural.',
+ref:'Manic Street Preachers "If You Tolerate This Your Children Will Be Next" — épica política y romántica',
+notes:'Uno de los más ambiciosos conceptualmente. Mezcla el lenguaje de las guerras de independencia latinoamericanas con el amor. "Náufrago del recuerdo", "guerra fría de nuestras miradas" — imágenes muy fuertes. Debería sonar grande.',
+priority:'alta'},
+
+{id:'p21',ca:1e12+21,title:'Mujer Veraniega',
+text:`Y si es hermosa\ncomo la arena.\n¡Todos la pisan!\n\nY si es preciosa\ncomo el sol\n¡Todos la miran!\n\nUn desierto curvo\nun ardiente tacto.\nMasaje molecular\n¡Blanco del Ártico!\n\nUnos blondos rizos\nhilvanados en remolinos\nreposan en la arena\nde su cuello veraniego.\n\n"¿Se derrumbara de tu pecho\nmi castillo de arena\npor los vientos del mar\ny los cantos de sirena?"\n\n"¿Fundiremos al cristal\ny veremos reflejado\nnuestro amor ideal?"\n\n¿Me quedare silente\nquieto como las olas\njunto a tu pasividad?\n\nAmada mujer desnuda,\nacostada en la arena inmortal.\n\n¿Y si tus ojos dormidos\nguardan el color reprimido\nde un océano por navegar?`,
+mood:'Sensual / Provocador',genre:'Shoegaze',tempo:'Lento',key:'Menor',
+estructura:[{t:'Intro',d:'Dos imágenes breves — la arena, el sol'},{t:'Verso',d:'El cuerpo como desierto y ártico'},{t:'Puente',d:'Las preguntas en cursiva — como sueño'},{t:'Outro',d:'"Amada mujer desnuda..." — caída final'}],
+accents:'Alternancia entre versos muy cortos (3 sílabas) y más largos (9–10). Ese contraste es musical en sí mismo — el músico puede jugar con silencios.',
+ref:'Slowdive meets The xx — textura sonora como paisaje de playa',
+notes:'Muy visual y sensorial. Los versos cortos del inicio son poderosos como golpes secos. Las preguntas entre comillas suenan como otro personaje o voz interior. La guitarra debe sonar cálida y reverberada.',
+priority:'normal'},
+
+{id:'p22',ca:1e12+22,title:'No quiero ser estrella',
+text:`No quiero ser estrella,\npara perderme en el cielo de la historia.\n\nNo quiero ser ídolo,\ny arder por el fuego de los enemigos.\n\nNo quiero ser memoria,\ny que me mate el aburrimiento o el olvido.\n\nNo quiero ser famoso,\ny me pongan en algún billete,\nde esos que hoy valen tan poco.\n\nNo quiero la gloria,\nme basta el respiro.\nNo quiero nada,\ny por ende de nadie\nsoy esclavo ni mendigo.\n\nMe gusta mi arte,\nme gusta mi idea;\npara quien lo mire será desastre\no continuación de La Odisea.`,
+mood:'Irónico',genre:'Punk',tempo:'Moderado-rápido',key:'Menor',
+estructura:[{t:'Verso',d:'Anáforas "No quiero..." — cinco golpes'},{t:'Puente',d:'"No quiero la gloria, me basta el respiro"'},{t:'Remate',d:'"Desastre o continuación de La Odisea"'}],
+accents:'La anáfora "No quiero" puede ser el riff vocal. Versos de 6–10 sílabas. Cada negación es un golpe de batería.',
+ref:'The Clash "Career Opportunities" — anti-ambición con actitud punk',
+notes:'Manifiesto anti-fama. Cada "No quiero" es un puñetazo. El remate final ("desastre o continuación de La Odisea") es típicamente irónico y grandioso a la vez. Canción corta, directa, sin adornos.',
+priority:'normal'},
+
+{id:'p23',ca:1e12+23,title:'Oración a la musa',
+text:`Hija de Zeus,\namante de la belleza,\nconsidera mi pluma,\nla puerta de tu grandeza.\n\nConsidérate presa\nen la cárcel de los hastios.\nConsidérate fantasma\ny precio han puesto por tu alma.\n\nY conjurare\npor el bien de los hombres\ntus liberales artes\nadjudicando tu nombre.\n\nTú, ¡musa!,\na veces vista,\ncomo mujer, paisaje\no locura.\ndescifrare tu voluntad\ncomo si de la cura\nfuese para mi mal:\nEsta macondiana soledad\nque tu haz llenado en su lugar.`,
+mood:'Contemplativo',genre:'Post-punk',tempo:'Moderado',key:'Menor modal',
+estructura:[{t:'Intro',d:'Invocación — guitarra sola'},{t:'Verso',d:'La pluma como puerta'},{t:'Verso',d:'La musa presa y fantasma'},{t:'Remate',d:'"Esta macondiana soledad..." — cierre íntimo'}],
+accents:'Versos de 5–8 sílabas. Rima asonante suave. El ritmo es el de una plegaria.',
+ref:'Nick Cave "Into My Arms" — devoción y belleza contenida',
+notes:'Oración pagana a la musa. La referencia a "macondiana soledad" (García Márquez) es muy colombiana. Tono ritual y calmado. Podría abrir un álbum o un set.',
+priority:'normal'},
+
+{id:'p24',ca:1e12+24,title:'Poeta',
+text:`El poeta se esconde entre versos,\nanhelante de besos, ¡su sed delirante!\nLástima, maldita sea, que sea tan cobarde.\n\nEntre pecados varios\nestá su genio atrabiliario,\nsu soberbia de invicto César\ny su ateísmo mientras versos reza.\n\nNacen de su cabeza, cual Bécquer,\nversos lascivos que a damas enloquecen,\ny lanza desatinos como aire,\nque saben dulces o huelen a desastre.\n\nY para ver el cielo abre su cuaderno,\nestrellas se le posan sin sufrir desvelo.\nToma a la hoja desprevenida\ny escribe en ella su verbal embestida,\nsobre una dama que le pareció bella,\no solo una más que le recordó a ella`,
+mood:'Irónico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'El cobarde y su sed'},{t:'Verso',d:'El César ateo que reza versos'},{t:'Verso',d:'Bécquer y los desatinos'},{t:'Remate',d:'"O solo una más que le recordó a ella" — golpe final'}],
+accents:'Versos de 9–12 sílabas. Rima asonante irregular. El ritmo es el de alguien hablando de sí mismo en tercera persona.',
+ref:'The Smiths "Bigmouth Strikes Again" — autorretrato irónico con mordida',
+notes:'Autorretrato del poeta como cobarde, soberbia y genio. La tercera persona crea distancia irónica brutal. El último verso es demoledor — toda la grandiosidad se derrumba en "una más que le recordó a ella".',
+priority:'normal'},
+
+{id:'p25',ca:1e12+25,title:'Religión',
+text:`Dame la calma del monje,\nde montañas, tibetano.\nDame la fe de los hombres,\nde entre todos, cristianos.\n\nDame la exactitud del científico\no la astucia del malvado,\n((judío)) avaro político.\n\nDame mil y un noches\nbajo la media luna,\nentre exóticas alfombras\ny niñas semidesnudas.\n\nAceptare cual estoico,\nla verdad inverencial,\nque lo poco que sabemos,\nnunca los saciara.\n\nVuelve de mi arte\nla fé de que beba\noh ilusa musa\nhasta que me muera.\n\nAhora el mundo\nes fe de razón:\n"Todo lo nuevo es bueno\ntodo lo viejo es malo"\ncomo si Mosin añejo\nno diese buen disparo.`,
+mood:'Filosófico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Anáforas "Dame..." — peticiones a todas las fes'},{t:'Verso',d:'El estoico y lo que no sabemos'},{t:'Puente',d:'La musa como única fe del arte'},{t:'Remate',d:'El mundo de razón y el rifle viejo'}],
+accents:'La anáfora "Dame" estructura el poema en peticiones. Versos de 6–9 sílabas. Ritmo de letanía.',
+ref:'Nick Cave "Into My Arms" meets Iggy Pop — espiritualidad pagana y provocación',
+notes:'Recorre el budismo, el cristianismo, el islam y la ciencia buscando una fe que sirva. La única que encuentra es el arte. El Mosin (rifle soviético) como metáfora de lo clásico que aún funciona — muy característico del autor.',
+priority:'normal'},
+
+{id:'p26',ca:1e12+26,title:'Saben Salados',
+text:`Saben salados sus senos\npor mis furtivas lagrimas\ndesangrando mi alma\ndel fútil desasosiego.\n\n¿Sera suya la idea\nde usarlos de pañuelo?\no ¿solo fue una quimera\nde mis ficticios sueños?\n\nmontes de diáfano lino,\ncon una piedra rosácea\nuna blanda,\nuna dura,\nvictima de las conjuras\nde mis labios delincuentes\npor el que gimes de repente.\n\n¡Por tus senos pasa un río\nde los lamentos míos!`,
+mood:'Sensual / Provocador',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'La imagen salada — apertura'},{t:'Verso',d:'La pregunta — ¿quimera o realidad?'},{t:'Puente',d:'"Labios delincuentes" — climax sensual'},{t:'Remate',d:'"Por tus senos pasa un río" — imagen final'}],
+accents:'Versos cortos de 5–8 sílabas. Rima asonante. El ritmo es íntimo y susurrado.',
+ref:'PJ Harvey "Dry" — erotismo crudo y poético en voz baja',
+notes:'Breve e intenso. La imagen de las lágrimas saladas sobre los senos es uno de los versos más originales del cuaderno. "Labios delincuentes" es una frase para el repertorio de frases memorables. Guitarra íntima y baja.',
+priority:'normal'},
+
+{id:'p27',ca:1e12+27,title:'Sensorial Lienzo',
+text:`Quiero de tu piel,\nvolverla arte\ny que galerías enteras\nestén de caricias llenas.\n\nQue mis dedos sean,\npinceles inagotables.\nEn tus curvas recreen,\nlejanos atardeceres.\n\nNo hace falta firma\nni créditos ni nada.\nSolo sonrisa bella\nde mi lienzo amada.`,
+mood:'Romántico',genre:'Shoegaze',tempo:'Lento',key:'Menor',
+estructura:[{t:'Verso',d:'El cuerpo como galería'},{t:'Verso',d:'Los dedos como pinceles'},{t:'Remate',d:'"Solo sonrisa bella" — resolución íntima'}],
+accents:'Versos de 5–7 sílabas. El más breve y tierno del cuaderno. Ritmo suave y constante.',
+ref:'Bon Iver meets Editors — intimidad absoluta',
+notes:'El más breve y delicado. Una sola imagen sostenida: el cuerpo amado como lienzo. Sin firma, sin crédito, solo la sonrisa. Guitarra limpia, casi acústica. Podría ser la canción más hermosa del repertorio.',
+priority:'normal'},
+
+{id:'p28',ca:1e12+28,title:'Sí, os ignoré',
+text:`Sí, os ignoré\nporque de tu cara\ndesearía palabras ver\ny no fría pantalla\nni insulsas intrigas\nde palabras dulces\naunque fueren mentiras.\n\nSí, os ignoré,\nporque vuestra presencia,\nno se asemeja, a mecánica sombra,\na ese fantasma\nque recorre los cinco sentidos.\npor ese digital campo,\npues igual que los sordos al canto,\n¿Qué me servirá hablar si no estas conmigo?\n\nDame entonces imagen.\nDe las que viento corta\ny calor emana.\nDe las de imperfecta forma\ny figura humana.\n\nDame entonces tu esencia\no desembrújame de esta ciencia\nde texto sin mensajes\ny corazones en venta.`,
+mood:'Melancólico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'"Sí, os ignoré" — confesión directa x2'},{t:'Puente',d:'"¿Qué me servirá hablar si no estás conmigo?"'},{t:'Coro',d:'"Dame entonces imagen..." — demanda real'},{t:'Remate',d:'"Corazones en venta" — golpe final'}],
+accents:'La anáfora "Sí, os ignoré" abre las dos estrofas. "Dame entonces" abre las dos finales. Estructura simétrica natural.',
+ref:'Interpol "NYC" — soledad urbana y digital, melancolía contenida',
+notes:'Crítica al amor digital, a los mensajes sin presencia. "Corazones en venta" es una frase perfecta para un estribillo. Muy contemporáneo — le va a sonar familiar a cualquier oyente joven.',
+priority:'normal'},
+
+{id:'p29',ca:1e12+29,title:'Soneto sin son ni eto',
+text:`Si la belleza fuera mujer, sería tu nombre;\nlástima que aún no soy tan hombre.\nSi la belleza fuera deleite,\nsería tu risa, indudablemente.\nSi la belleza fuera movimiento,\nsería tu pelo movido por el viento.\n\nSi la belleza no fueras tú,\ny todo fuera ilusión de luz,\ny el valor temiera mi nombre,\nyo derivaría en mares de mujeres\ndonde la cama se perdiera entre pieles.\n\nPero de fantasías no vive el perro,\nni siquiera el poeta —el peor de ellos—.\n\nNo es tu lindeza la que me mueve,\nsino mi obsesión por lo que suceda.\nY mientras el sol muera tarde\ny lo secunde una blanca herida,\nya sé que para ayer es tarde\ndecirte, en tu ignorancia perdida,\nque tienes un nuevo amante...\ny no lo sabes todavía.`,
+mood:'Romántico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Anáforas "Si la belleza..." — tres imágenes'},{t:'Puente',d:'"Pero de fantasías no vive el perro..."'},{t:'Remate',d:'"Tienes un nuevo amante y no lo sabes todavía"'}],
+accents:'Anáforas de "Si la belleza" con versos de 10–12 sílabas. El remate final rompe el esquema — baja en versos cortos.',
+ref:'The Smiths "I Know It\'s Over" — declaración imposible con belleza e ironía',
+notes:'El título es un chiste brillante que funciona como golpe de entrada. Las anáforas de "Si la belleza" construyen tensión que se rompe con el chiste del perro. El remate final ("tienes un nuevo amante y no lo sabes") es devastador.',
+priority:'normal'},
+
+{id:'p30',ca:1e12+30,title:'Sophia',
+text:`Entre las lisas nubes de mi alcoba\nencontré soñolientos tus ojos azules.\nEndémica eres de este paisaje\ny la tez de tu piel igual es\na los más vírgenes glaciares.\n\nTiritas, y no es por fiebre.\nMuerdes, y no es por hambre.\nLloras y no es de dolor.\n(¿o no?)\n\nResuelto a curar tu amargura,\ntus senos me ahogan en la locura.\nRompo la regla de los museos\ny toco todo cuanto deseo.\n\nTe beso en el frente,\ny te susurro en la espalda\nversos inteligentes\nde nuestras pasiones pasadas.\n\nY artista resultas del amor.\nEn tus manos suaves.\nEn tus labios gruesos.\nEmbobado por el brillo de tu rostro.\nOlvido que es el dolor.`,
+mood:'Romántico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'Los ojos azules y los glaciares'},{t:'Puente',d:'"Tiritas, y no es por fiebre..." — tres golpes secos'},{t:'Verso',d:'Romper la regla de los museos'},{t:'Remate',d:'"Olvido que es el dolor"'}],
+accents:'Los tres versos cortos centrales ("Tiritas... Muerdes... Lloras...") son tres golpes secos de 7 sílabas. Contraste perfecto con las estrofas más largas.',
+ref:'Joy Division "Love Will Tear Us Apart" — ternura y fractura a la vez',
+notes:'"Tiritas, y no es por fiebre / Muerdes, y no es por hambre / Lloras y no es de dolor" — esos tres versos son los más memorables del poema. Tres golpes secos que el músico puede trabajar como riff rítmico.',
+priority:'normal'},
+
+{id:'p31',ca:1e12+31,title:'Soy un desatino',
+text:`Soy un forajido entre rejas\nun fantasma de carne.\nUn contratiempo previsto\nun guerrero con sotana.\n\nSoy un foráneo con acento de acá\nUn terrorista,\nbombardeando paz.\nUn voraz,\ncultivando pan.\n\nSoy un fanfarrón modesto\ny porto en mis dedos,\nkilates de caricias,\ny brillan mis labios\ncuando te digo "te quiero"\n\nSoy un soldado,\nUn cabo, un asesino, un coronel\ny pinto con sangre escarlata,\nel lienzo que la humanidad es.\n\nSoy una iguana costumbrista.\nUn poeta disléxico publicando diccionarios\nSoy un cojo, un ciego, un manco\nComo el que luchó en Lepanto\no el que murió en Cartagena guerreando.\n\nSoy un señor de la guerra,\nen Suiza.\nSoy un cuerdo en el mundo,\nDe Alicia.\n\nSoy la soledad en compañía\nla calma intempestiva\nla paz desatada,\no la guerra en donde Heidi\ncon sus amigos jugaba.\n\nSoy el destino extraviado,\nun astronauta en la mar.\nUn pirata en alguna galaxia\njurando por Dios regresar.\n\nSoy tú entre tus palabras:\nEl desatino que tus labios callan.`,
+mood:'Épico',genre:'Rock',tempo:'Moderado-rápido',key:'Menor',
+estructura:[{t:'Coro',d:'"Soy un..." — anáfora que regresa varias veces'},{t:'Verso',d:'Forajido, terrorista, fanfarrón'},{t:'Verso',d:'El soldado y el lienzo de humanidad'},{t:'Verso',d:'Cervantes, Suiza, Alicia, el cosmos'},{t:'Remate',d:'"Soy tú entre tus palabras"'}],
+accents:'La anáfora "Soy un" es el motor. Versos de longitud muy variable — el contraste es la estructura. Los oxímorons son el contenido.',
+ref:'The Clash "I\'m So Bored With The USA" meets Manic Street Preachers — largo, épico, contradictorio',
+notes:'El manifiesto de identidad del autor. Lleno de oxímorons brillantes: guerrero con sotana, terrorista bombardeando paz, señor de la guerra en Suiza. Referencias a Cervantes, Alicia en el País de las Maravillas, Heidi. El cierre "Soy tú entre tus palabras" es de los mejores versos del cuaderno.',
+priority:'alta'},
+
+{id:'p32',ca:1e12+32,title:'Te llaman ladrona',
+text:`Te llaman ladrona,\ndel cielo, las nubes\nporque recelan de ti\ntus dos ojos azules.\n\nSendas estrellas\nel firmamento reclama\nmismas que hoy\nse han extraviado en mi cama.\n\nIluminas sin prisa\ncon tu excelsa caricia.\nLos filosos círculos\ny las redondas esquinas\ndel teseracto bajo mi piel.\n\nY el pintoresco pintor de las nubes\n--Unos dicen que es Dios,\notros que alguien mas atroz.--\nes navegante frugal\nentre la vagancia y los azules\ny por eso tantos días tan iguales son\n--En su lejanía, en su nada,\nen la sutil fragancia de Hada--\n¡No hay nada nuevo bajo el sol!\no al menos nada que valga.`,
+mood:'Romántico',genre:'Post-punk',tempo:'Lento',key:'Menor',
+estructura:[{t:'Verso',d:'La ladrona de nubes — presentación'},{t:'Verso',d:'Las estrellas extraviadas en la cama'},{t:'Puente',d:'El teseracto bajo la piel — imagen central'},{t:'Remate',d:'"No hay nada nuevo bajo el sol / o al menos nada que valga"'}],
+accents:'Versos de 6–9 sílabas. Rima asonante. El poema se construye de imagen en imagen, cada una más intensa.',
+ref:'Interpol "Stella Was A Diver" — imagen femenina convertida en cosmos',
+notes:'"El teseracto bajo mi piel" es una de las imágenes más originales del cuaderno. El remate nihilista ("nada que valga") contrasta perfectamente con todo el poema que vino antes. El Dios "o alguien más atroz" como pintor de nubes es muy característico del autor.',
+priority:'normal'},
+
+{id:'p33',ca:1e12+33,title:'Tiene todo hombre una tierra',
+text:`Todo hombre tiene una tierra,\ny le aterra el perderla.\n\nTodo hombre tiene una tierra\ndonde sus recuerdos son la mala hierba\nque con raíces lo encadenan,\na la peor de las tinieblas.\n\nTodo hombre tiene una tierra\ndonde sus penas entierra\ny se cosechan aguadas tristezas.\nO furibundas furias,\no paces tan fugaces\nen las guerras mas rotundas.\nLucha contra su tumba,\nlos fantasmas que lo ahogan\nen el seco mar de la soledad\ndonde se fritan los peces sin sal.\n\nNo tengo de tierra un gramo\nni maizales ni latifundios y,\nde todo este rumbo moribundo\ntengo una flor del nuevo mundo.\n\nUna bella orquídea\nque cuido en vigilias\ncultivada en la blancura\nde las nubes de tu piel.\n\nRegada por lluvias llorosas\nde la alegría mas profunda de tu ser.\n\nTodo hombre tiene una tierra.\nAlgunos tienen poemas.\n--Leves versos que los condenan--\nPocos tienen flor tan bella,\natravesada como daga.\nQue al corazón tomo secuestrada\npor tan nívea dama\nde dulces palabras.`,
+mood:'Nostálgico',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Coro',d:'"Todo hombre tiene una tierra" — estribillo que regresa'},{t:'Verso',d:'La tierra como cadena y tumba'},{t:'Puente',d:'"No tengo de tierra un gramo..." — giro'},{t:'Verso',d:'La orquídea cultivada en tu piel'},{t:'Coro',d:'"Algunos tienen poemas... pocos tienen flor tan bella"'}],
+accents:'La anáfora "Todo hombre tiene una tierra" es el estribillo natural. Versos de 7–10 sílabas. El ritmo es el de un discurso que se vuelve poema de amor.',
+ref:'The National "Bloodbuzz Ohio" meets Springsteen — nostalgia de tierra que se convierte en amor',
+notes:'Empieza como poema político-existencial sobre la tierra y el exilio, y termina siendo un poema de amor con una orquídea. El giro es perfecto. "El seco mar de la soledad donde se fritan los peces sin sal" es una imagen surrealista que rompe el tono de forma brillante.',
+priority:'normal'},
+
+{id:'p34',ca:1e12+34,title:'Últimas rosas',
+text:`Amada, si muero:\narranca las flores del jardín.\n¡No llores!\nYa las regué para ti.\nY déjalas en mi pecho,\ndonde florece la metralla.`,
+mood:'Oscuro / Místico',genre:'Heavy / Doom',tempo:'Muy lento',key:'Menor',
+estructura:[{t:'Intro',d:'Silencio — una sola nota'},{t:'Verso',d:'La instrucción y la flor'},{t:'Remate',d:'"Donde florece la metralla" — golpe final'}],
+accents:'Seis versos. El más corto y concentrado del cuaderno junto a Memento Mori. Cada verso es un golpe.',
+ref:'Black Sabbath "Solitude" — belleza devastadora en seis líneas',
+notes:'El poema más corto y quizás el más poderoso de todo el cuaderno. "Donde florece la metralla" es un verso para recordar toda la vida. Guerra y amor en una sola imagen. Si se convierte en canción debe durar máximo 2 minutos — cualquier segundo adicional lo arruinaría.',
+priority:'alta'},
+
+{id:'p35',ca:1e12+35,title:'Vale más el anillo',
+text:`Vale mas el anillo,\no el vestido amarillo\nque el aire te abraza\nen las madrugadas.\n\nValen mas mis poemas\ny sus intrincadas rimas\nque los rubores malevos\ncon los que tu rostro maquillas.\n\nVale mas la rosa descomplicada\nraptada de su rosal,\nestoica hasta las espinas\nrociando durante su exilio\nlos aromas de su bondad.\n\nValen menos tus besos,\nlos he tomado al fiado,\nlos creí míos\ny me has embargado.`,
+mood:'Rabia / Protesta',genre:'Post-punk',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'"Vale más..." — primera comparación'},{t:'Verso',d:'"Valen más mis poemas..." — el arte contra el amor falso'},{t:'Verso',d:'La rosa estoica — imagen central'},{t:'Remate',d:'"Me has embargado" — golpe legal y emocional'}],
+accents:'Anáforas de "Vale más / Valen más / Valen menos" construyen el argumento como una factura. Versos de 6–9 sílabas.',
+ref:'The Smiths "I Don\'t Owe You Anything" — despecho con dignidad poética',
+notes:'"Los he tomado al fiado / los creí míos / y me has embargado" — lenguaje contable para hablar de besos. Es el mismo truco de "Alegato a Ella" con el lenguaje legal, pero aplicado a las finanzas. Muy ingenioso. El vestido amarillo es una imagen curiosamente tierna en un poema de rabia.',
+priority:'normal'},
+
+{id:'p36',ca:1e12+36,title:'Versos banales sobre una musa inexistente',
+text:`Se ha ido mi musa.\nMe puso alguna excusa,\nque no logro recordar.\n\nVolteó al revés mi cabeza,\nVació el lago de mi indiferencia.\nMe embriagó la soledad,\nque tiene el con quien no habla.\n\nMi musa es una ilusa\nque logré engatusar.\nTemblando sus pies al susurrar\nTartamuda versos bellos\nQue escuchó en un viejo bar\n\nMi musa es lasciva\ny taciturna, en mi alcoba me seduce\nal exilio onírico prolongarlo de por vida\ny a sus caricias declamar como vital.\n\nPero si tanto me quisiera,\nNo se iría a ningún lugar.\nNi que amarrada a la cama,\nsu brillo se fuera a apagar.\n\nEnciende el aire con su humo,\nFlotando hace su andar,\nDegusta su jugo de lulo.\nDice que la olvide,\ncomo si yo la pudiera recordar.`,
+mood:'Irónico',genre:'Indie rock',tempo:'Moderado',key:'Menor',
+estructura:[{t:'Verso',d:'La musa que se fue con excusa'},{t:'Verso',d:'"Mi musa es una ilusa..." — primera definición'},{t:'Verso',d:'"Mi musa es lasciva..." — segunda definición'},{t:'Remate',d:'"Dice que la olvide, como si yo la pudiera recordar"'}],
+accents:'Versos de 6–10 sílabas. Rima asonante juguetona. El tono es el de alguien que habla de una exnovia con afecto sarcástico.',
+ref:'Arctic Monkeys "Fluorescent Adolescent" — ironía dulce y nostalgia',
+notes:'El remate final es magistral: "Dice que la olvide, como si yo la pudiera recordar" — no sabe si la recuerda o la olvida, y eso lo dice todo. "Degusta su jugo de lulo" — detalle colombiano muy concreto que da ternura inesperada. Ligereza que equilibra el cuaderno.',
+priority:'normal'}
+];
+
+function init(){
+  const s=localStorage.getItem('poemasV3');
+  if(!s){poems=SEED.map(p=>({...p}));save();}
+  else poems=JSON.parse(s);
+  renderFilters();renderList();
+  const first=poems.find(p=>p.priority==='alta')||poems[0];
+  if(first)selectPoem(first.id);
+}
+function save(){localStorage.setItem('poemasV3',JSON.stringify(poems));}
+function gid(){return 'u'+Date.now().toString(36);}
+
+function renderFilters(){
+  const bar=document.getElementById('filtersBar');
+  const moods=[...new Set(poems.map(p=>p.mood).filter(Boolean))];
+  const genres=[...new Set(poems.map(p=>p.genre).filter(Boolean))];
+  bar.innerHTML=[
+    ...moods.map(m=>`<button class="chip${fM===m?' on':''}" onclick="toggleF('mood',${JSON.stringify(m)})">${m}</button>`),
+    ...genres.map(g=>`<button class="chip${fG===g?' on':''}" onclick="toggleF('genre',${JSON.stringify(g)})">${g}</button>`)
+  ].join('');
+}
+function toggleF(type,val){
+  if(type==='mood')fM=fM===val?'':val;
+  else fG=fG===val?'':val;
+  renderFilters();renderList();
+}
+function renderList(){
+  const q=document.getElementById('sInput').value.toLowerCase();
+  const list=document.getElementById('plist');
+  const cnt=document.getElementById('pcount');
+  let f=poems.filter(p=>{
+    const mq=!q||p.title.toLowerCase().includes(q)||(p.text||'').toLowerCase().includes(q);
+    const mm=!fM||p.mood===fM;const mg=!fG||p.genre===fG;
+    return mq&&mm&&mg;
+  });
+  f.sort((a,b)=>{
+    const pa=a.priority==='alta'?0:a.priority==='baja'?2:1;
+    const pb=b.priority==='alta'?0:b.priority==='baja'?2:1;
+    return pa-pb||(b.ca||0)-(a.ca||0);
+  });
+  cnt.textContent=`${f.length} poema${f.length!==1?'s':''}`;
+  if(!f.length){list.innerHTML='<div class="empty-sb">Ningún poema coincide.</div>';return;}
+  list.innerHTML=f.map(p=>`
+    <div class="pitem${p.id===selId?' on':''}" onclick="selectPoem('${p.id}')">
+      <div class="ptitle">${esc(p.title||'Sin título')}</div>
+      <div class="pmeta">
+        ${p.mood?`<span class="tag">${esc(p.mood)}</span>`:''}
+        ${p.genre?`<span class="tag">${esc(p.genre)}</span>`:''}
+        ${p.priority==='alta'?'<span class="tag pri">★ prioridad</span>':''}
+      </div>
+    </div>`).join('');
+}
+function selectPoem(id){
+  const p=poems.find(x=>x.id===id);if(!p)return;
+  selId=p.id;renderList();
+  const main=document.getElementById('main');
+  let estrHtml='';
+  if(p.estructura&&p.estructura.length){
+    estrHtml=`<ul class="estr-list">${p.estructura.map(s=>`
+      <li class="estr-item"><span class="etag">${esc(s.t)}</span><span>${esc(s.d)}</span></li>`).join('')}</ul>`;
+  }else estrHtml='<span style="color:var(--t4);font-size:12px;font-style:italic;">Sin estructura definida</span>';
+
+  main.innerHTML=`<div class="detail">
+    <div class="dhead">
+      <h1 class="dtitle">${esc(p.title||'Sin título')}</h1>
+      <div class="dbtns">
+        <button class="dbtn copy" onclick="copyPoem('${p.id}')">Copiar</button>
+        <button class="dbtn" onclick="openModal('${p.id}')">Editar</button>
+        <button class="dbtn" onclick="delPoem('${p.id}')">Eliminar</button>
+      </div>
+    </div>
+    <div class="dbody">
+      <div class="poem-col">
+        <h3>Poema</h3>
+        <div class="poem-text">${esc(p.text||'')}</div>
+      </div>
+      <div class="info-col">
+        <div class="iblock"><h4>Mood &amp; Género</h4>
+          <div class="ibadges">
+            ${p.mood?`<span class="ibadge">${esc(p.mood)}</span>`:''}
+            ${p.genre?`<span class="ibadge">${esc(p.genre)}</span>`:''}
+            ${!p.mood&&!p.genre?'<span style="color:var(--t4);font-size:12px;font-style:italic;">Sin definir</span>':''}
+          </div>
+        </div>
+        ${p.tempo||p.key?`<div class="iblock"><h4>Tempo &amp; Tonalidad</h4>
+          ${p.tempo?`<div class="val">⟳  ${esc(p.tempo)}</div>`:''}
+          ${p.key?`<div class="val">♩  ${esc(p.key)}</div>`:''}
+        </div>`:''}
+        <div class="iblock"><h4>Estructura</h4>${estrHtml}</div>
+        ${p.accents?`<div class="iblock"><h4>Acentos &amp; Sílabas</h4><div class="val" style="white-space:pre-wrap">${esc(p.accents)}</div></div>`:''}
+        ${p.ref?`<div class="iblock"><h4>Referencia musical</h4><div class="val" style="font-style:italic">"${esc(p.ref)}"</div></div>`:''}
+        ${p.notes?`<div class="iblock"><h4>Notas del autor</h4><div class="val" style="white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:14px;font-style:italic;line-height:1.8">${esc(p.notes)}</div></div>`:''}
+        ${p.priority==='alta'?`<div class="iblock" style="border-color:var(--b3)"><div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--t2);margin-bottom:6px">★ Prioridad alta</div><div style="font-size:12px;color:var(--t3)">El autor quiere convertir este primero.</div></div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+function delPoem(id){
+  if(!confirm('¿Eliminar este poema?'))return;
+  poems=poems.filter(p=>p.id!==id);save();selId=null;
+  document.getElementById('main').innerHTML='<div class="no-sel"><div class="glyph">✦</div><p>Selecciona un poema</p></div>';
+  renderFilters();renderList();showToast('Eliminado.');
+}
+function copyPoem(id){
+  const p=poems.find(x=>x.id===id);if(!p)return;
+  let t=`═══ ${p.title||'Sin título'} ═══\n\n${p.text||''}`;
+  if(p.mood||p.genre)t+=`\n\nMood: ${p.mood||'—'}   Género: ${p.genre||'—'}`;
+  if(p.tempo)t+=`\nTempo: ${p.tempo}`;
+  if(p.key)t+=`   Tonalidad: ${p.key}`;
+  if(p.estructura&&p.estructura.length)t+='\n\nEstructura:\n'+p.estructura.map(s=>`  [${s.t}] ${s.d}`).join('\n');
+  if(p.accents)t+=`\n\nAcentos / Sílabas:\n${p.accents}`;
+  if(p.ref)t+=`\n\nReferencia: "${p.ref}"`;
+  if(p.notes)t+=`\n\nNotas del autor:\n${p.notes}`;
+  navigator.clipboard.writeText(t).then(()=>showToast('Copiado ✓')).catch(()=>showToast('No se pudo copiar.'));
+}
+function addRow(t='',d=''){
+  const i=eRows.length;eRows.push({t:t||SEC[0],d:d});
+  const c=document.getElementById('estrEd');
+  const row=document.createElement('div');row.className='estr-row';
+  row.innerHTML=`<select onchange="eRows[${i}].t=this.value">${SEC.map(s=>`<option value="${s}"${t===s?' selected':''}>${s}</option>`).join('')}</select>
+    <input type="text" placeholder="Descripción..." value="${escA(d)}" oninput="eRows[${i}].d=this.value">
+    <button class="btn-rm" onclick="rmRow(this,${i})">×</button>`;
+  c.appendChild(row);
+}
+function rmRow(btn,i){btn.parentElement.remove();eRows.splice(i,1);rebuildRows();}
+function rebuildRows(){
+  eRows=[];
+  document.querySelectorAll('#estrEd .estr-row').forEach(row=>{
+    const s=row.querySelector('select');const inp=row.querySelector('input');
+    if(s&&inp)eRows.push({t:s.value,d:inp.value});
+  });
+}
+function openModal(id){
+  eRows=[];document.getElementById('estrEd').innerHTML='';
+  if(id){
+    const p=poems.find(x=>x.id===id);if(!p)return;
+    document.getElementById('mTitle').textContent='Editar Poema';
+    document.getElementById('eId').value=id;
+    document.getElementById('fTitle').value=p.title||'';
+    document.getElementById('fText').value=p.text||'';
+    document.getElementById('fMood').value=p.mood||'';
+    document.getElementById('fGenre').value=p.genre||'';
+    document.getElementById('fTempo').value=p.tempo||'';
+    document.getElementById('fKey').value=p.key||'';
+    document.getElementById('fAccents').value=p.accents||'';
+    document.getElementById('fRef').value=p.ref||'';
+    document.getElementById('fNotes').value=p.notes||'';
+    document.getElementById('fPri').value=p.priority||'normal';
+    if(p.estructura)p.estructura.forEach(s=>addRow(s.t,s.d));
+  }else{
+    document.getElementById('mTitle').textContent='Nuevo Poema';
+    document.getElementById('eId').value='';
+    ['fTitle','fText','fAccents','fRef','fNotes'].forEach(x=>document.getElementById(x).value='');
+    ['fMood','fGenre','fTempo','fKey'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('fPri').value='normal';
+    addRow('Intro','');addRow('Verso','');addRow('Coro','');
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function handleOv(e){if(e.target===document.getElementById('overlay'))closeModal();}
+function savePoem(){
+  const title=document.getElementById('fTitle').value.trim();
+  if(!title){document.getElementById('fTitle').focus();showToast('Escribe un título.');return;}
+  rebuildRows();
+  const id=document.getElementById('eId').value;
+  const data={
+    title,text:document.getElementById('fText').value,
+    mood:document.getElementById('fMood').value,genre:document.getElementById('fGenre').value,
+    tempo:document.getElementById('fTempo').value,key:document.getElementById('fKey').value,
+    accents:document.getElementById('fAccents').value,ref:document.getElementById('fRef').value,
+    notes:document.getElementById('fNotes').value,priority:document.getElementById('fPri').value,
+    estructura:eRows.filter(r=>r.t).map(r=>({t:r.t,d:r.d}))
+  };
+  if(id){const i=poems.findIndex(p=>p.id===id);poems[i]={...poems[i],...data};showToast('Actualizado ✓');}
+  else{data.id=gid();data.ca=Date.now();poems.unshift(data);selId=data.id;showToast('Guardado ✓');}
+  save();closeModal();renderFilters();renderList();
+  if(selId)selectPoem(selId);
+}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escA(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+init();
+</script>
+</body>
+</html>
